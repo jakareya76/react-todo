@@ -1,7 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const getLocalStorageTodos = () => {
+  const todos = localStorage.getItem("Todos");
+
+  if (!todos) {
+    return [];
+  } else {
+    return JSON.parse(todos);
+  }
+};
 
 const Todo = () => {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState(getLocalStorageTodos());
   const [todo, setTodo] = useState("");
 
   const handleAddToTodo = (e) => {
@@ -13,6 +23,18 @@ const Todo = () => {
 
     setTodo("");
   };
+
+  const handleDeleteTodo = (id) => {
+    setTodos((prevTodo) => {
+      return prevTodo.filter((_, idx) => {
+        return idx !== id;
+      });
+    });
+  };
+
+  useEffect(() => {
+    localStorage.setItem("Todos", JSON.stringify(todos));
+  }, [todos]);
 
   return (
     <div className="grid w-full h-screen bg-zinc-900 place-items-center">
@@ -28,7 +50,7 @@ const Todo = () => {
             />
             <button
               type="submit"
-              className="p-3 ml-2 rounded text-zinc-300 bg-zinc-600"
+              className="p-3 ml-2 rounded text-zinc-100 bg-zinc-600"
             >
               Add
             </button>
@@ -43,7 +65,10 @@ const Todo = () => {
                   className="flex items-center justify-between border-b border-zinc-700"
                 >
                   <li>{todo}</li>
-                  <button className="px-4 py-2 mb-2 rounded bg-zinc-600">
+                  <button
+                    onClick={() => handleDeleteTodo(idx)}
+                    className="px-4 py-2 mb-2 rounded bg-zinc-600"
+                  >
                     Delete
                   </button>
                 </div>
